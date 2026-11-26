@@ -3,116 +3,75 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-  <title>Deffi Team</title>
+  <title>DeffiTeam 2.0</title>
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
   <div id="snow"></div>
-
-  <div id="app">
-    <!-- Шапка -->
-    <header class="header">
-      <div class="logo">
-        <span class="logo-icon">❄</span>
-        <h1>Deffi Team</h1>
-      </div>
-      <button id="cart-btn" class="cart-btn">
-        🛒 <span id="cart-count">0</span>
-      </button>
-    </header>
-
-    <!-- Новогодний баннер -->
-    <div class="ny-banner">
-      ❄ Deffi Team • Быстрая выдача
-    </div>
-
-    <!-- Каталог -->
-    <main id="catalog" class="catalog"></main>
-
-    <!-- Корзина (модалка) -->
-    <div id="cart-modal" class="modal hidden">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h2>🛒 Корзина</h2>
-          <button class="close-btn" onclick="closeCart()">×</button>
-        </div>
-        <div id="cart-items"></div>
-        <div class="cart-total">
-          Итого: <span id="cart-total">0</span> ₽
-        </div>
-
-        <div class="delivery-section">
-          <label class="radio-label">
-            <input type="radio" name="delivery" value="pickup" checked />
-            📍 Самовывоз — 18/70 Зябь
-          </label>
-          <label class="radio-label">
-            <input type="radio" name="delivery" value="delivery" />
-            🚚 Доставка по городу (+250 ₽)
-          </label>
-          <div id="address-field" class="hidden">
-            <input type="text" id="address" placeholder="Адрес доставки" />
-          </div>
-        </div>
-
-        <div class="contact-section">
-          <input type="text" id="name" placeholder="Ваше имя" />
-          <input type="tel" id="phone" placeholder="Телефон *" required />
-        </div>
-
-        <button id="order-btn" class="order-btn" onclick="submitOrder()">Оформить заказ</button>
+  <div id="age-modal" class="modal age-modal">
+    <div class="age-card">
+      <div class="age-snow">❄</div>
+      <h2>DeffiTeam 2.0</h2>
+      <p>Вам есть 18 лет?</p>
+      <div class="age-actions">
+        <button id="age-no" class="age-btn age-no">Нет</button>
+        <button id="age-yes" class="age-btn age-yes">Да</button>
       </div>
     </div>
-
-    <!-- Админка -->
-    <div id="admin-modal" class="modal hidden">
-      <div class="modal-content admin-content">
-        <div class="modal-header">
-          <h2>⚙️ Админка</h2>
-          <button class="close-btn" onclick="closeAdmin()">×</button>
-        </div>
-
-        <div id="admin-login">
-          <input type="password" id="admin-password" placeholder="Пароль" />
-          <button onclick="loginAdmin()">Войти</button>
-        </div>
-
-        <div id="admin-panel" class="hidden">
-          <h3>Добавить / изменить товар</h3>
-          <input type="hidden" id="edit-id" />
-          <input type="text" id="p-name" placeholder="Название" />
-          <input type="text" id="p-desc" placeholder="Описание (вкус, затяжки)" />
-          <input type="number" id="p-price" placeholder="Цена ₽" />
-          <input type="number" id="p-stock" placeholder="Наличие (шт)" />
-          <input type="text" id="p-photo" placeholder="Ссылка на фото (необязательно)" />
-          <button onclick="saveProduct()">Сохранить товар</button>
-
-          <h3 style="margin-top:20px">Текущие товары</h3>
-          <div id="admin-products"></div>
-        </div>
-      </div>
-    </div>
-
-    <!-- Кнопка админки -->
-    <button id="admin-open" class="admin-open-btn" onclick="openAdmin()">⚙️</button>
   </div>
 
+  <div id="app" class="app-hidden">
+    <header class="header">
+      <div class="brand"><span>🎄</span><strong>DeffiTeam 2.0</strong></div>
+      <button id="cart-btn" class="cart-btn" aria-label="Корзина">🛒 <span id="cart-count">0</span></button>
+    </header>
+
+    <div class="promo"><b>🎁 АКЦИЯ</b><span>При заказе от 2000 ₽ — жижа в подарок!</span></div>
+
+    <main>
+      <section class="catalog-head">
+        <h1>Каталог</h1>
+        <span id="product-count">0 товаров</span>
+      </section>
+      <label class="search"><span>⌕</span><input id="search-input" type="search" placeholder="Поиск товаров" autocomplete="off" /></label>
+      <div id="catalog" class="catalog"></div>
+    </main>
+
+    <nav class="bottom-nav">
+      <button class="nav-active"><span>▦</span><small>Каталог</small></button>
+      <button id="nav-cart"><span>🛒</span><small>Корзина</small></button>
+    </nav>
+
+    <div id="cart-modal" class="modal hidden">
+      <div class="modal-content">
+        <div class="modal-header"><h2>Корзина</h2><button class="close-btn" onclick="closeCart()">×</button></div>
+        <div id="cart-items"></div>
+        <div class="cart-total"><span>Итого</span><b id="cart-total">0 ₽</b></div>
+        <h3 class="section-title">Способ получения</h3>
+        <div class="delivery-options">
+          <label><input type="radio" name="delivery" value="pickup-18" checked /><span><b>Самовывоз</b><small>18/70 Зябь</small></span></label>
+          <label><input type="radio" name="delivery" value="pickup-32" /><span><b>Самовывоз</b><small>32/01</small></span></label>
+          <label><input type="radio" name="delivery" value="delivery" /><span><b>Доставка</b><small>По городу · 250 ₽</small></span></label>
+        </div>
+        <div id="address-field" class="hidden"><input type="text" id="address" placeholder="Адрес доставки" /></div>
+        <input type="text" id="name" placeholder="Ваше имя" /><input type="tel" id="phone" placeholder="Телефон *" />
+        <button id="order-btn" class="order-btn" onclick="submitOrder()">Заказать</button>
+      </div>
+    </div>
+
+    <div id="admin-modal" class="modal hidden">
+      <div class="modal-content admin-content">
+        <div class="modal-header"><h2>Админ-панель</h2><button class="close-btn" onclick="closeAdmin()">×</button></div>
+        <div id="admin-login"><input type="password" id="admin-password" placeholder="Пароль" /><button onclick="loginAdmin()">Войти</button></div>
+        <div id="admin-panel" class="hidden">
+          <input type="hidden" id="edit-id" /><input type="text" id="p-name" placeholder="Название" /><input type="text" id="p-desc" placeholder="Описание" /><input type="number" id="p-price" placeholder="Цена ₽" /><input type="number" id="p-stock" placeholder="Остаток (шт)" /><input type="text" id="p-photo" placeholder="Ссылка на фото" /><button onclick="saveProduct()">Сохранить товар</button>
+          <h3 class="section-title">Товары</h3><div id="admin-products"></div>
+        </div>
+      </div>
+    </div>
+    <button id="admin-open" class="admin-open-btn" onclick="openAdmin()">⚙</button>
+  </div>
   <script src="app.js"></script>
-  <script>
-    // Лёгкий снег
-    const snowContainer = document.getElementById('snow');
-    for (let i = 0; i < 35; i++) {
-      const flake = document.createElement('div');
-      flake.className = 'snowflake';
-      flake.style.left = Math.random() * 100 + 'vw';
-      flake.style.animationDuration = (Math.random() * 6 + 6) + 's';
-      flake.style.animationDelay = (Math.random() * 5) + 's';
-      flake.style.opacity = Math.random() * 0.6 + 0.3;
-      flake.style.fontSize = (Math.random() * 12 + 10) + 'px';
-      flake.innerHTML = '❄';
-      snowContainer.appendChild(flake);
-    }
-  </script>
 </body>
 </html>
