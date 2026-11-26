@@ -40,7 +40,7 @@ if (!fs.existsSync(PRODUCTS_FILE)) {
 
 app.use(cors());
 app.use(bodyParser.json());
-app.use(express.static(path.join(__dirname, 'public')));
+app.use(express.static(__dirname));
 
 // Получить все товары
 app.get('/api/products', (req, res) => {
