@@ -1,0 +1,16 @@
+{
+  "name": "telegram-vape-shop",
+  "version": "1.0.0",
+  "description": "Telegram Mini App для продажи электронных сигарет",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node server.js"
+  },
+  "dependencies": {
+    "express": "^4.21.0",
+    "cors": "^2.8.5",
+    "node-fetch": "^2.7.0",
+    "body-parser": "^1.20.3"
+  }
+}

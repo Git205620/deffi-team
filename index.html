@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>Deffi Team</title>
+  <script src="https://telegram.org/js/telegram-web-app.js"></script>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div id="snow"></div>
+
+  <div id="app">
+    <!-- Шапка -->
+    <header class="header">
+      <div class="logo">
+        <span class="logo-icon">❄</span>
+        <h1>Deffi Team</h1>
+      </div>
+      <button id="cart-btn" class="cart-btn">
+        🛒 <span id="cart-count">0</span>
+      </button>
+    </header>
+
+    <!-- Новогодний баннер -->
+    <div class="ny-banner">
+      ❄ Deffi Team • Быстрая выдача
+    </div>
+
+    <!-- Каталог -->
+    <main id="catalog" class="catalog"></main>
+
+    <!-- Корзина (модалка) -->
+    <div id="cart-modal" class="modal hidden">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h2>🛒 Корзина</h2>
+          <button class="close-btn" onclick="closeCart()">×</button>
+        </div>
+        <div id="cart-items"></div>
+        <div class="cart-total">
+          Итого: <span id="cart-total">0</span> ₽
+        </div>
+
+        <div class="delivery-section">
+          <label class="radio-label">
+            <input type="radio" name="delivery" value="pickup" checked />
+            📍 Самовывоз — 18/70 Зябь
+          </label>
+          <label class="radio-label">
+            <input type="radio" name="delivery" value="delivery" />
+            🚚 Доставка по городу (+250 ₽)
+          </label>
+          <div id="address-field" class="hidden">
+            <input type="text" id="address" placeholder="Адрес доставки" />
+          </div>
+        </div>
+
+        <div class="contact-section">
+          <input type="text" id="name" placeholder="Ваше имя" />
+          <input type="tel" id="phone" placeholder="Телефон *" required />
+        </div>
+
+        <button id="order-btn" class="order-btn" onclick="submitOrder()">Оформить заказ</button>
+      </div>
+    </div>
+
+    <!-- Админка -->
+    <div id="admin-modal" class="modal hidden">
+      <div class="modal-content admin-content">
+        <div class="modal-header">
+          <h2>⚙️ Админка</h2>
+          <button class="close-btn" onclick="closeAdmin()">×</button>
+        </div>
+
+        <div id="admin-login">
+          <input type="password" id="admin-password" placeholder="Пароль" />
+          <button onclick="loginAdmin()">Войти</button>
+        </div>
+
+        <div id="admin-panel" class="hidden">
+          <h3>Добавить / изменить товар</h3>
+          <input type="hidden" id="edit-id" />
+          <input type="text" id="p-name" placeholder="Название" />
+          <input type="text" id="p-desc" placeholder="Описание (вкус, затяжки)" />
+          <input type="number" id="p-price" placeholder="Цена ₽" />
+          <input type="number" id="p-stock" placeholder="Наличие (шт)" />
+          <input type="text" id="p-photo" placeholder="Ссылка на фото (необязательно)" />
+          <button onclick="saveProduct()">Сохранить товар</button>
+
+          <h3 style="margin-top:20px">Текущие товары</h3>
+          <div id="admin-products"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Кнопка админки -->
+    <button id="admin-open" class="admin-open-btn" onclick="openAdmin()">⚙️</button>
+  </div>
+
+  <script src="app.js"></script>
+  <script>
+    // Лёгкий снег
+    const snowContainer = document.getElementById('snow');
+    for (let i = 0; i < 35; i++) {
+      const flake = document.createElement('div');
+      flake.className = 'snowflake';
+      flake.style.left = Math.random() * 100 + 'vw';
+      flake.style.animationDuration = (Math.random() * 6 + 6) + 's';
+      flake.style.animationDelay = (Math.random() * 5) + 's';
+      flake.style.opacity = Math.random() * 0.6 + 0.3;
+      flake.style.fontSize = (Math.random() * 12 + 10) + 'px';
+      flake.innerHTML = '❄';
+      snowContainer.appendChild(flake);
+    }
+  </script>
+</body>
+</html>
