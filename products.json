@@ -1,0 +1,90 @@
+[
+  {
+    "id": 1,
+    "name": "Skala 50мг - Ананас со льдом",
+    "description": "",
+    "category": "жижи",
+    "subcategory": "Skala",
+    "price": 350,
+    "stock1870": 1,
+    "stock3201": 1,
+    "photo": "https://res.cloudinary.com/yovkf3nu/image/upload/v1795803704/eilibk3cym29zsdgllwl.jpg"
+  },
+  {
+    "id": 2,
+    "name": "Skala 50мг - Банан со льдом",
+    "description": "",
+    "category": "жижи",
+    "subcategory": "Skala",
+    "price": 350,
+    "stock1870": 0,
+    "stock3201": 1,
+    "photo": "https://res.cloudinary.com/yovkf3nu/image/upload/v1795806622/lwefta3cwitddm4awdeh.jpg"
+  },
+  {
+    "id": 3,
+    "name": "Skala 50мг - Виноград со льдом",
+    "description": "",
+    "category": "жижи",
+    "subcategory": "Skala",
+    "price": 350,
+    "stock1870": 1,
+    "stock3201": 1,
+    "photo": "https://res.cloudinary.com/yovkf3nu/image/upload/v1795806697/v1zr0zvhx5mraclxr0p4.jpg"
+  },
+  {
+    "id": 4,
+    "name": "Skala 50мг - Вишня со льдом",
+    "description": "",
+    "category": "жижи",
+    "subcategory": "Skala",
+    "price": 350,
+    "stock1870": 1,
+    "stock3201": 1,
+    "photo": "https://res.cloudinary.com/yovkf3nu/image/upload/v1795811773/gdbm9nn8evdqhpcl3ase.jpg"
+  },
+  {
+    "id": 5,
+    "name": "Skala 50мг - Грейпфрут со льдом",
+    "description": "",
+    "category": "жижи",
+    "subcategory": "Skala",
+    "price": 350,
+    "stock1870": 1,
+    "stock3201": 0,
+    "photo": "https://res.cloudinary.com/yovkf3nu/image/upload/v1795812408/ny50urmeeyqaw5k8zd2h.jpg"
+  },
+  {
+    "id": 6,
+    "name": "Skala 50мг - Дыня со льдом",
+    "description": "",
+    "category": "жижи",
+    "subcategory": "Skala",
+    "price": 350,
+    "stock1870": 1,
+    "stock3201": 0,
+    "photo": "https://res.cloudinary.com/yovkf3nu/image/upload/v1795812567/n9ssrtms4ofqf5g3roq9.jpg"
+  },
+  {
+    "id": 7,
+    "name": "Skala 50мг - Груша со льдом",
+    "description": "",
+    "category": "жижи",
+    "subcategory": "Skala",
+    "price": 350,
+    "stock1870": 1,
+    "stock3201": 0,
+    "photo": "https://res.cloudinary.com/yovkf3nu/image/upload/v1795812720/jznayeymjk7qgwspq1vb.jpg"
+  },
+  {
+    "id": 8,
+    "name": "Skala 50мг - Ежевика со льдом",
+    "description": "",
+    "category": "жижи",
+    "subcategory": "Skala",
+    "price": 350,
+    "stock1870": 2,
+    "stock3201": 1,
+    "photo": "https://res.cloudinary.com/yovkf3nu/image/upload/v1795812980/tousjv1st0vbw1cut2vn.jpg"
+  }
+]
