@@ -61,8 +61,16 @@ function chooseWarehouse(value) {
   renderCatalog();
 }
 function updateWarehouseLabel() {
-  $('warehouse-current').textContent = selectedWarehouse === '1870' ? 'Склад 18/70' : 'Склад 32/01';
-  $('pickup-text').textContent = selectedWarehouse === '1870' ? 'Самовывоз — 18/70 Зябь' : 'Самовывоз — 32/01';
+  const label = selectedWarehouse === '1870' ? 'Склад 18/70' : 'Склад 32/01';
+
+  $('warehouse-current').textContent = label;
+  $('change-warehouse-btn').textContent = label;
+  $('warehouse-current-cart').textContent = label;
+
+  $('pickup-text').textContent = selectedWarehouse === '1870'
+    ? 'Самовывоз — 18/70 Зябь'
+    : 'Самовывоз — 32/01';
+
   $('pickup-radio').value = 'pickup';
 }
 function switchWarehouse() { showWarehouseChooser(); }
