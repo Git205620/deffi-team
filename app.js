@@ -1,13 +1,411 @@
-const tg=window.Telegram?.WebApp;if(tg){tg.ready();tg.expand()}let products=[],cart={},adminRole=null;const q=s=>document.querySelector(s),qs=s=>document.querySelectorAll(s);const telegramHeaders=()=>({'Content-Type':'application/json','X-Telegram-Init-Data':tg?.initData||''});
-q('#age-yes').onclick=()=>{sessionStorage.setAge='yes';q('#age-modal').classList.add('hidden');q('#app').classList.remove('app-hidden')};q('#age-no').onclick=()=>{q('.age-card').innerHTML='<div class="age-snow">🔒</div><h2>Доступ запрещён</h2><p>Для входа требуется 18 лет.</p>'};if(sessionStorage.getAge==='yes'){q('#age-modal').classList.add('hidden');q('#app').classList.remove('app-hidden')}
-async function loadProducts(){try{const r=await fetch('/api/products');products=await r.json();renderCatalog()}catch(e){q('#catalog').innerHTML='<p>Не удалось загрузить товары</p>'}}
-function escapeHtml(v){return String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
-function renderCatalog(){const s=q('#search-input').value.toLowerCase().trim(),list=products.filter(p=>p.stock>0&&(`${p.name} ${p.description||''}`).toLowerCase().includes(s));q('#product-count').textContent=`${list.length} товаров`;q('#catalog').innerHTML='';list.forEach(p=>{const c=document.createElement('article');c.className='product-card';c.innerHTML=`${p.photo?`<img class="product-photo" src="${escapeHtml(p.photo)}" alt="">`:'<div class="product-photo"></div>'}<div class="product-info"><div class="product-name">${escapeHtml(p.name)}</div><div class="product-desc">${escapeHtml(p.description||'')}</div><div class="stock">Осталось: ${p.stock} шт</div><div class="product-bottom"><span class="product-price">${p.price} ₽</span><button class="add-btn" onclick="addToCart(${p.id})">В корзину</button></div></div>`;q('#catalog').appendChild(c)})}
-function addToCart(id){const p=products.find(x=>x.id===id);if(!p||p.stock<=0)return;if((cart[id]||0)>=p.stock){showAlert('Больше нет в наличии');return}cart[id]=(cart[id]||0)+1;updateCartCount()}function updateCartCount(){q('#cart-count').textContent=Object.values(cart).reduce((a,b)=>a+b,0)}function openCart(){renderCart();q('#cart-modal').classList.remove('hidden')}function closeCart(){q('#cart-modal').classList.add('hidden')}q('#cart-btn').onclick=openCart;q('#nav-cart').onclick=openCart;
-function renderCart(){const box=q('#cart-items');box.innerHTML='';let goods=0,ids=Object.keys(cart);if(!ids.length)box.innerHTML='<p style="text-align:center;color:#92a99a;padding:20px">Корзина пуста</p>';ids.forEach(id=>{const p=products.find(x=>x.id==id);if(!p)return;const qty=cart[id];goods+=p.price*qty;box.insertAdjacentHTML('beforeend',`<div class="cart-item"><div><b>${escapeHtml(p.name)}</b><div style="color:#9ab0a1;font-size:12px;margin-top:4px">${p.price} ₽ × ${qty}</div></div><div class="qty-controls"><button class="qty-btn" onclick="changeQty(${id},-1)">−</button><span>${qty}</span><button class="qty-btn" onclick="changeQty(${id},1)">+</button></div></div>`)});const delivery=q('input[name="delivery"]:checked')?.value==='delivery';q('#address-field').classList.toggle('hidden',!delivery);q('#cart-total').textContent=(goods+(delivery&&ids.length?250:0))+' ₽'}function changeQty(id,d){const p=products.find(x=>x.id==id);cart[id]=(cart[id]||0)+d;if(cart[id]<=0)delete cart[id];if(cart[id]>p.stock)cart[id]=p.stock;updateCartCount();renderCart()}qs('input[name="delivery"]').forEach(r=>r.onchange=renderCart);q('#search-input').oninput=renderCatalog;
-async function submitOrder(){const phone=q('#phone').value.trim(),ids=Object.keys(cart);if(!ids.length)return showAlert('Корзина пуста');if(!phone)return showAlert('Укажите телефон');const method=q('input[name="delivery"]:checked').value,address=q('#address').value.trim();if(method==='delivery'&&!address)return showAlert('Укажите адрес доставки');const items=ids.map(id=>{const p=products.find(x=>x.id==id);return{id:p.id,name:p.name,price:p.price,quantity:cart[id]}}),u=tg?.initDataUnsafe?.user||{};const order={items,deliveryType:method,address:method==='delivery'?address:null,name:q('#name').value.trim(),phone,username:u.username||null,userId:u.id||null};try{const r=await fetch('/api/order',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(order)}),d=await r.json();if(d.success){showAlert('Заказ отправлен!');cart={};updateCartCount();closeCart()}else showAlert(d.error||'Ошибка отправки')}catch(e){showAlert('Не удалось отправить заказ')}}
-function showAlert(s){tg?.showAlert?tg.showAlert(s):alert(s)}
-async function openAdmin(){q('#admin-modal').classList.remove('hidden');q('#admin-login').classList.add('hidden');q('#admin-panel').classList.add('hidden');try{const r=await fetch('/api/admin/me',{headers:telegramHeaders()}),d=await r.json();if(!r.ok||!d.authorized){showAlert(d.error||'У вас нет доступа к админ-панели');closeAdmin();return}adminRole=d.role;q('#admin-panel').classList.remove('hidden');q('#admin-role').textContent=adminRole==='owner'?'Владелец':'Администратор';q('#owner-tools').classList.toggle('hidden',adminRole!=='owner');renderAdminProducts();if(adminRole==='owner')loadAdmins()}catch(e){showAlert('Не удалось проверить доступ');closeAdmin()}}function closeAdmin(){q('#admin-modal').classList.add('hidden');adminRole=null}
-function renderAdminProducts(){q('#admin-products').innerHTML='';products.forEach(p=>q('#admin-products').insertAdjacentHTML('beforeend',`<div class="admin-product"><div><b>${escapeHtml(p.name)}</b><br><small>${p.price} ₽ · ${p.stock} шт</small></div><div><button onclick="editProduct(${p.id})">✏️</button><button onclick="deleteProduct(${p.id})">🗑</button></div></div>`))}function editProduct(id){const p=products.find(x=>x.id===id);q('#edit-id').value=p.id;q('#p-name').value=p.name;q('#p-desc').value=p.description||'';q('#p-price').value=p.price;q('#p-stock').value=p.stock;q('#p-photo').value=p.photo||'';q('#product-form-title').textContent='Изменить товар';q('#product-form').scrollIntoView({behavior:'smooth'})}function clearProductForm(){q('#edit-id').value='';q('#p-name').value='';q('#p-desc').value='';q('#p-price').value='';q('#p-stock').value='';q('#p-photo').value='';q('#product-form-title').textContent='Новая карточка товара'}async function saveProduct(){if(!adminRole)return;const id=q('#edit-id').value,name=q('#p-name').value.trim(),description=q('#p-desc').value.trim(),price=Number(q('#p-price').value),stock=Number(q('#p-stock').value),photo=q('#p-photo').value.trim();if(!name||!Number.isFinite(price)||price<0||!Number.isInteger(stock)||stock<0)return showAlert('Проверьте название, цену и остаток');if(id)Object.assign(products.find(p=>p.id==id),{name,description,price,stock,photo});else products.push({id:products.length?Math.max(...products.map(p=>Number(p.id)))+1:1,name,description,price,stock,photo});try{const r=await fetch('/api/admin/products',{method:'POST',headers:telegramHeaders(),body:JSON.stringify({products})}),d=await r.json();if(!r.ok||!d.success){await loadProducts();return showAlert(d.error||'Ошибка сохранения')}clearProductForm();renderAdminProducts();renderCatalog();showAlert('Товар сохранён')}catch(e){showAlert('Ошибка сети')}}async function deleteProduct(id){if(!adminRole||!confirm('Удалить товар?'))return;const old=products;products=products.filter(p=>p.id!==id);try{const r=await fetch('/api/admin/products',{method:'POST',headers:telegramHeaders(),body:JSON.stringify({products})}),d=await r.json();if(!r.ok||!d.success){products=old;return showAlert(d.error||'Ошибка удаления')}renderAdminProducts();renderCatalog()}catch(e){products=old;showAlert('Ошибка сети')}}
-async function loadAdmins(){try{const r=await fetch('/api/admin/admins',{headers:telegramHeaders()}),d=await r.json();if(!r.ok)throw new Error(d.error);q('#admin-list').innerHTML=`<div class="admin-user"><b>Вы — владелец</b><small>ID: ${escapeHtml(d.ownerId)}</small></div>`+(d.admins||[]).map(id=>`<div class="admin-user"><span>Администратор · ID ${escapeHtml(id)}</span><button onclick="removeAdmin('${escapeHtml(id)}')">Убрать</button></div>`).join('')}catch(e){showAlert(e.message||'Не удалось загрузить список администраторов')}}async function addAdmin(){const telegramId=q('#new-admin-id').value.trim();try{const r=await fetch('/api/admin/admins',{method:'POST',headers:telegramHeaders(),body:JSON.stringify({telegramId})}),d=await r.json();if(!r.ok)throw new Error(d.error);q('#new-admin-id').value='';loadAdmins();showAlert('Администратор добавлен')}catch(e){showAlert(e.message||'Ошибка добавления')}}async function removeAdmin(id){if(!confirm(`Убрать администратора ${id}?`))return;try{const r=await fetch(`/api/admin/admins/${encodeURIComponent(id)}`,{method:'DELETE',headers:telegramHeaders()}),d=await r.json();if(!r.ok)throw new Error(d.error);loadAdmins();showAlert('Доступ администратора отозван')}catch(e){showAlert(e.message||'Ошибка удаления')}}
-for(let i=0;i<30;i++){const f=document.createElement('div');f.className='snowflake';f.style.left=Math.random()*100+'vw';f.style.animationDuration=(5+Math.random()*7)+'s';f.style.animationDelay=-Math.random()*8+'s';f.style.fontSize=(9+Math.random()*10)+'px';f.textContent='❄';q('#snow').appendChild(f)}loadProducts();
+const tg = window.Telegram.WebApp;
+tg.ready();
+tg.expand();
+
+let products = [];
+let cart = {};
+let adminPassword = null;
+let currentCategory = 'all';
+let searchQuery = '';
+
+// ========== КАТАЛОГ ==========
+async function loadProducts() {
+  try {
+    const res = await fetch('/api/products');
+    products = await res.json();
+    renderCatalog();
+  } catch (e) {
+    console.error(e);
+    document.getElementById('catalog').innerHTML = '<p style="padding:20px">Не удалось загрузить товары</p>';
+  }
+}
+
+function renderCatalog() {
+  const catalog = document.getElementById('catalog');
+  catalog.innerHTML = '';
+
+  let filtered = products;
+
+  // Фильтр по категории
+  if (currentCategory !== 'all') {
+    filtered = filtered.filter(p => p.category === currentCategory);
+  }
+
+  // Поиск
+  if (searchQuery) {
+    const q = searchQuery.toLowerCase();
+    filtered = filtered.filter(p => 
+      (p.name && p.name.toLowerCase().includes(q)) || 
+      (p.description && p.description.toLowerCase().includes(q))
+    );
+  }
+
+  if (filtered.length === 0) {
+    catalog.innerHTML = '<p style="padding:20px;opacity:0.6;grid-column:1/-1">Ничего не найдено</p>';
+    return;
+  }
+
+  filtered.forEach(p => {
+    if (p.stock <= 0) return;
+
+    const card = document.createElement('div');
+    card.className = 'product-card';
+    card.innerHTML = `
+      ${p.photo ? `<img class="product-photo" src="${p.photo}" alt="${p.name}" onerror="this.style.display='none'">` : '<div class="product-photo"></div>'}
+      <div class="product-info">
+        <div class="product-name">${p.name}</div>
+        <div class="product-desc">${p.description || ''}</div>
+        <div class="product-bottom">
+          <div class="product-price">${p.price} ₽</div>
+          <button class="add-btn" onclick="addToCart(${p.id})">В корзину</button>
+        </div>
+      </div>
+    `;
+    catalog.appendChild(card);
+  });
+}
+
+// Категории
+document.querySelectorAll('.cat-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.cat-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    currentCategory = btn.dataset.cat;
+    renderCatalog();
+  });
+});
+
+// ========== КОРЗИНА ==========
+function addToCart(id) {
+  const product = products.find(p => p.id === id);
+  if (!product || product.stock <= 0) return;
+
+  if (!cart[id]) cart[id] = 0;
+  if (cart[id] < product.stock) {
+    cart[id]++;
+    updateCartCount();
+  } else {
+    tg.showAlert('Больше нет в наличии');
+  }
+}
+
+function updateCartCount() {
+  const count = Object.values(cart).reduce((a, b) => a + b, 0);
+  document.getElementById('cart-count').textContent = count;
+}
+
+function openCart() {
+  renderCart();
+  document.getElementById('cart-modal').classList.remove('hidden');
+}
+
+function closeCart() {
+  document.getElementById('cart-modal').classList.add('hidden');
+}
+
+function renderCart() {
+  const container = document.getElementById('cart-items');
+  container.innerHTML = '';
+
+  let total = 0;
+  const ids = Object.keys(cart);
+
+  if (ids.length === 0) {
+    container.innerHTML = '<p style="opacity:0.6;padding:20px 0">Корзина пуста</p>';
+    document.getElementById('cart-total').textContent = '0';
+    return;
+  }
+
+  ids.forEach(id => {
+    const product = products.find(p => p.id == id);
+    if (!product) return;
+    const qty = cart[id];
+    const sum = product.price * qty;
+    total += sum;
+
+    const div = document.createElement('div');
+    div.className = 'cart-item';
+    div.innerHTML = `
+      <div class="cart-item-info">
+        <div>${product.name}</div>
+        <div style="font-size:13px;opacity:0.7">${product.price} ₽ × ${qty}</div>
+      </div>
+      <div class="qty-controls">
+        <button class="qty-btn" onclick="changeQty(${id}, -1)">−</button>
+        <span>${qty}</span>
+        <button class="qty-btn" onclick="changeQty(${id}, 1)">+</button>
+      </div>
+    `;
+    container.appendChild(div);
+  });
+
+  const deliveryType = document.querySelector('input[name="delivery"]:checked').value;
+  if (deliveryType === 'delivery') total += 250;
+
+  document.getElementById('cart-total').textContent = total;
+}
+
+function changeQty(id, delta) {
+  const product = products.find(p => p.id == id);
+  if (!product) return;
+
+  cart[id] = (cart[id] || 0) + delta;
+  if (cart[id] <= 0) delete cart[id];
+  if (cart[id] > product.stock) cart[id] = product.stock;
+
+  updateCartCount();
+  renderCart();
+}
+
+document.querySelectorAll('input[name="delivery"]').forEach(radio => {
+  radio.addEventListener('change', () => {
+    const isDelivery = document.querySelector('input[name="delivery"]:checked').value === 'delivery';
+    document.getElementById('address-field').classList.toggle('hidden', !isDelivery);
+    renderCart();
+  });
+});
+
+// ========== ЗАКАЗ ==========
+async function submitOrder() {
+  const phone = document.getElementById('phone').value.trim();
+  if (!phone) {
+    tg.showAlert('Укажите телефон');
+    return;
+  }
+
+  const ids = Object.keys(cart);
+  if (ids.length === 0) {
+    tg.showAlert('Корзина пуста');
+    return;
+  }
+
+  const deliveryType = document.querySelector('input[name="delivery"]:checked').value;
+  const address = document.getElementById('address').value.trim();
+  const name = document.getElementById('name').value.trim();
+
+  if (deliveryType === 'delivery' && !address) {
+    tg.showAlert('Укажите адрес доставки');
+    return;
+  }
+
+  const items = ids.map(id => {
+    const p = products.find(pr => pr.id == id);
+    return {
+      id: p.id,
+      name: p.name,
+      price: p.price,
+      quantity: cart[id]
+    };
+  });
+
+  let total = items.reduce((sum, i) => sum + i.price * i.quantity, 0);
+  if (deliveryType === 'delivery') total += 250;
+
+  let deliveryText = '';
+  if (deliveryType === 'pickup1') deliveryText = 'Самовывоз: 18/70 Зябь';
+  else if (deliveryType === 'pickup2') deliveryText = 'Самовывоз: 32/01';
+  else deliveryText = `Доставка (+250 ₽): ${address}`;
+
+  const user = tg.initDataUnsafe?.user || {};
+
+  const order = {
+    items,
+    total,
+    deliveryType,
+    deliveryText,
+    address: deliveryType === 'delivery' ? address : null,
+    name,
+    phone,
+    username: user.username || null,
+    userId: user.id || null
+  };
+
+  try {
+    const res = await fetch('/api/order', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(order)
+    });
+
+    const data = await res.json();
+    if (data.success) {
+      tg.showAlert('Заказ отправлен! Мы скоро свяжемся с вами.');
+      cart = {};
+      updateCartCount();
+      closeCart();
+    } else {
+      tg.showAlert(data.error || 'Ошибка при отправке заказа');
+    }
+  } catch (e) {
+    tg.showAlert('Не удалось отправить заказ. Попробуйте позже.');
+  }
+}
+
+// ========== АДМИНКА ==========
+function openAdmin() {
+  document.getElementById('admin-modal').classList.remove('hidden');
+  document.getElementById('admin-login').classList.remove('hidden');
+  document.getElementById('admin-panel').classList.add('hidden');
+}
+
+function closeAdmin() {
+  document.getElementById('admin-modal').classList.add('hidden');
+  adminPassword = null;
+}
+
+async function loginAdmin() {
+  const password = document.getElementById('admin-password').value;
+  try {
+    const res = await fetch('/api/admin/login', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ password })
+    });
+    const data = await res.json();
+    if (data.success) {
+      adminPassword = password;
+      document.getElementById('admin-login').classList.add('hidden');
+      document.getElementById('admin-panel').classList.remove('hidden');
+      renderAdminProducts();
+    } else {
+      tg.showAlert('Неверный пароль');
+    }
+  } catch (e) {
+    tg.showAlert('Ошибка входа');
+  }
+}
+
+function renderAdminProducts() {
+  const container = document.getElementById('admin-products');
+  container.innerHTML = '';
+
+  products.forEach(p => {
+    const div = document.createElement('div');
+    div.className = 'admin-product';
+    div.innerHTML = `
+      <div>
+        <div><b>${p.name}</b> — ${p.price} ₽</div>
+        <div style="font-size:13px;opacity:0.7">${p.category || 'без категории'} · Наличие: ${p.stock} шт</div>
+      </div>
+      <div>
+        <button onclick="editProduct(${p.id})">✏️</button>
+        <button onclick="deleteProduct(${p.id})">🗑</button>
+      </div>
+    `;
+    container.appendChild(div);
+  });
+}
+
+function editProduct(id) {
+  const p = products.find(pr => pr.id === id);
+  if (!p) return;
+  document.getElementById('edit-id').value = p.id;
+  document.getElementById('p-name').value = p.name;
+  document.getElementById('p-desc').value = p.description || '';
+  document.getElementById('p-category').value = p.category || 'одноразки';
+  document.getElementById('p-price').value = p.price;
+  document.getElementById('p-stock').value = p.stock;
+  document.getElementById('p-photo').value = p.photo || '';
+  document.getElementById('photo-preview').innerHTML = p.photo ? `<img src="${p.photo}" style="max-width:100px;margin-top:8px;border-radius:8px">` : '';
+}
+
+// Загрузка фото с телефона
+document.getElementById('p-photo-file').addEventListener('change', function(e) {
+  const file = e.target.files[0];
+  if (!file) return;
+  
+  if (file.size > 1.5 * 1024 * 1024) {
+    tg.showAlert('Фото слишком большое (макс 1.5 МБ)');
+    return;
+  }
+
+  const reader = new FileReader();
+  reader.onload = function(ev) {
+    const dataUrl = ev.target.result;
+    document.getElementById('p-photo').value = dataUrl;
+    document.getElementById('photo-preview').innerHTML = `<img src="${dataUrl}" style="max-width:100px;margin-top:8px;border-radius:8px">`;
+  };
+  reader.readAsDataURL(file);
+});
+
+async function saveProduct() {
+  if (!adminPassword) return;
+
+  const id = document.getElementById('edit-id').value;
+  const name = document.getElementById('p-name').value.trim();
+  const description = document.getElementById('p-desc').value.trim();
+  const category = document.getElementById('p-category').value;
+  const price = parseInt(document.getElementById('p-price').value) || 0;
+  const stock = parseInt(document.getElementById('p-stock').value) || 0;
+  const photo = document.getElementById('p-photo').value.trim();
+
+  if (!name || price <= 0) {
+    tg.showAlert('Заполните название и цену');
+    return;
+  }
+
+  if (id) {
+    const idx = products.findIndex(p => p.id == id);
+    if (idx !== -1) {
+      products[idx] = { ...products[idx], name, description, category, price, stock, photo };
+    }
+  } else {
+    const newId = products.length ? Math.max(...products.map(p => p.id)) + 1 : 1;
+    products.push({ id: newId, name, description, category, price, stock, photo });
+  }
+
+  try {
+    const res = await fetch('/api/admin/products', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ password: adminPassword, products })
+    });
+    const data = await res.json();
+    if (data.success) {
+      document.getElementById('edit-id').value = '';
+      document.getElementById('p-name').value = '';
+      document.getElementById('p-desc').value = '';
+      document.getElementById('p-price').value = '';
+      document.getElementById('p-stock').value = '';
+      document.getElementById('p-photo').value = '';
+      document.getElementById('p-photo-file').value = '';
+      document.getElementById('photo-preview').innerHTML = '';
+      renderAdminProducts();
+      renderCatalog();
+      tg.showAlert('Товар сохранён');
+    } else {
+      tg.showAlert('Ошибка сохранения');
+    }
+  } catch (e) {
+    tg.showAlert('Ошибка сети');
+  }
+}
+
+async function deleteProduct(id) {
+  if (!confirm('Удалить товар?')) return;
+  products = products.filter(p => p.id !== id);
+
+  try {
+    const res = await fetch('/api/admin/products', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ password: adminPassword, products })
+    });
+    if ((await res.json()).success) {
+      renderAdminProducts();
+      renderCatalog();
+    }
+  } catch (e) {
+    tg.showAlert('Ошибка удаления');
+  }
+}
+
+// Поиск
+document.getElementById('search-input').addEventListener('input', (e) => {
+  searchQuery = e.target.value.trim();
+  renderCatalog();
+});
+
+// ========== ИНИЦИАЛИЗАЦИЯ ==========
+document.getElementById('cart-btn').addEventListener('click', openCart);
+loadProducts();
