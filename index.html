@@ -9,7 +9,9 @@
 </head>
 <body>
   <div id="snow"></div>
-  <div class="garland"></div>
+  <div class="garland">
+    <div class="garland-lights"></div>
+  </div>
 
   <div id="app">
     <!-- Шапка -->
@@ -22,6 +24,18 @@
         🛒 <span id="cart-count">0</span>
       </button>
     </header>
+
+    <!-- Наличие по точкам -->
+    <div class="stock-bar">
+      <div class="stock-point">
+        <span class="stock-label">18/70</span>
+        <span id="stock-1870" class="stock-value">—</span>
+      </div>
+      <div class="stock-point">
+        <span class="stock-label">32/01</span>
+        <span id="stock-3201" class="stock-value">—</span>
+      </div>
+    </div>
 
     <!-- Баннер -->
     <div class="ny-banner">
@@ -45,6 +59,24 @@
 
     <!-- Каталог -->
     <main id="catalog" class="catalog"></main>
+
+    <!-- Карточка товара -->
+    <div id="product-modal" class="modal hidden">
+      <div class="modal-content product-detail">
+        <div class="modal-header">
+          <h2 id="pd-name">Товар</h2>
+          <button class="close-btn" onclick="closeProduct()">×</button>
+        </div>
+        <img id="pd-photo" class="pd-photo" src="" alt="">
+        <div id="pd-desc" class="pd-desc"></div>
+        <div class="pd-stocks">
+          <div>18/70: <b id="pd-stock-1870">0</b> шт</div>
+          <div>32/01: <b id="pd-stock-3201">0</b> шт</div>
+        </div>
+        <div class="pd-price" id="pd-price">0 ₽</div>
+        <button class="order-btn" id="pd-add-btn">В корзину</button>
+      </div>
+    </div>
 
     <!-- Корзина -->
     <div id="cart-modal" class="modal hidden">
@@ -89,7 +121,7 @@
       </div>
     </div>
 
-    <!-- Админка (скрытая) -->
+    <!-- Админка -->
     <div id="admin-modal" class="modal hidden">
       <div class="modal-content admin-content">
         <div class="modal-header">
@@ -115,7 +147,8 @@
             <option value="снюсы">Снюсы</option>
           </select>
           <input type="number" id="p-price" placeholder="Цена ₽" />
-          <input type="number" id="p-stock" placeholder="Наличие (шт)" />
+          <input type="number" id="p-stock-1870" placeholder="Наличие 18/70" />
+          <input type="number" id="p-stock-3201" placeholder="Наличие 32/01" />
           
           <div class="photo-upload">
             <label class="photo-label">Фото товара</label>
@@ -137,7 +170,7 @@
   <script>
     // Снег
     const snowContainer = document.getElementById('snow');
-    for (let i = 0; i < 30; i++) {
+    for (let i = 0; i < 35; i++) {
       const flake = document.createElement('div');
       flake.className = 'snowflake';
       flake.style.left = Math.random() * 100 + 'vw';
@@ -149,7 +182,18 @@
       snowContainer.appendChild(flake);
     }
 
-    // Скрытый вход в админку: 5 быстрых кликов по логотипу
+    // Гирлянда огоньки
+    const lights = document.querySelector('.garland-lights');
+    const colors = ['#ef4444','#22c55e','#eab308','#3b82f6','#a855f7','#f97316'];
+    for (let i = 0; i < 24; i++) {
+      const light = document.createElement('div');
+      light.className = 'light';
+      light.style.background = colors[i % colors.length];
+      light.style.animationDelay = (i * 0.15) + 's';
+      lights.appendChild(light);
+    }
+
+    // 5 кликов по логотипу = админка
     let logoClicks = 0;
     let logoTimer = null;
     document.querySelector('.logo').addEventListener('click', () => {
