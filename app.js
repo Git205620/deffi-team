@@ -266,16 +266,46 @@ function editProduct(id) {
   document.getElementById('photo-preview').innerHTML = p.photo ? '<img src="'+p.photo+'" style="max-width:100px;margin-top:8px;border-radius:8px">' : '';
 }
 
-document.getElementById('p-photo-file').addEventListener('change', function(e) {
+document.getElementById('p-photo-file').addEventListener('change', async function(e) {
   const file = e.target.files[0];
   if (!file) return;
-  if (file.size > 1.5*1024*1024) { tg.showAlert('Фото слишком большое'); return; }
-  const reader = new FileReader();
-  reader.onload = ev => {
-    document.getElementById('p-photo').value = ev.target.result;
-    document.getElementById('photo-preview').innerHTML = '<img src="'+ev.target.result+'" style="max-width:100px;margin-top:8px;border-radius:8px">';
-  };
-  reader.readAsDataURL(file);
+
+  if (file.size > 5 * 1024 * 1024) {
+    tg.showAlert('Фото должно быть меньше 5 МБ');
+    return;
+  }
+
+  const formData = new FormData();
+  formData.append('file', file);
+  formData.append('upload_preset', 'deffi_products');
+
+  try {
+    tg.showAlert('Загружаю фотографию...');
+
+    const response = await fetch(
+      'https://api.cloudinary.com/v1_1/yovkf3nu/image/upload',
+      {
+        method: 'POST',
+        body: formData
+      }
+    );
+
+    const data = await response.json();
+
+    if (!response.ok) {
+      throw new Error(data.error?.message || 'Ошибка загрузки');
+    }
+
+    document.getElementById('p-photo').value = data.secure_url;
+
+    document.getElementById('photo-preview').innerHTML =
+      '<img src="' + data.secure_url + '" style="max-width:100px;margin-top:8px;border-radius:8px">';
+
+    tg.showAlert('Фото загружено!');
+  } catch (error) {
+    console.error(error);
+    tg.showAlert('Не удалось загрузить фото: ' + error.message);
+  }
 });
 
 async function saveProduct() {
