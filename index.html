@@ -61,7 +61,7 @@
         <div class="cart-warehouse">Ваш склад: <strong id="warehouse-current-cart">выбранный</strong></div>
         <div id="cart-items"></div>
         <div class="cart-total">Итого: <span id="cart-total">0</span> ₽</div>
-        <div class="promo-text">🎁 При покупке от 2000 рублей — подарок по условиям магазина</div>
+        <div class="promo-text">🎁 При покупке от 2000 рублей — подарок жижа солевая монашка!</div>
         <div class="delivery-section">
           <label class="radio-label"><input id="pickup-radio" type="radio" name="delivery" value="pickup" checked><span id="pickup-text">Самовывоз</span></label>
           <label class="radio-label"><input type="radio" name="delivery" value="delivery">🚚 Доставка по городу (+250 ₽)</label>
@@ -110,7 +110,26 @@
               <button id="new-product-btn" class="secondary-btn" type="button">Очистить форму</button>
             </div>
             <h3 class="admin-section-title">Текущие товары</h3>
-            <div id="admin-products"></div>
+
+<div class="admin-search">
+  <input
+    type="search"
+    id="admin-product-search"
+    placeholder="🔍 Поиск товара по названию..."
+    oninput="renderAdminProducts()"
+  >
+
+  <select id="admin-product-category" onchange="renderAdminProducts()">
+    <option value="all">Все категории</option>
+    <option value="жижи">Жижи</option>
+    <option value="вейпы">Вейпы</option>
+    <option value="одноразки">Одноразки</option>
+    <option value="комплектующие">Комплектующие</option>
+    <option value="снюсы">Снюсы</option>
+  </select>
+</div>
+
+<div id="admin-products"></div>
           </section>
           <section id="admin-orders-view" class="hidden">
             <button class="secondary-btn refresh-btn" onclick="loadAdminOrders()">Обновить заказы</button>
