@@ -14,21 +14,10 @@ async function loadProducts() {
     const res = await fetch('/api/products');
     products = await res.json();
     renderCatalog();
-    updateStockBar();
   } catch (e) {
     console.error(e);
     document.getElementById('catalog').innerHTML = '<p style="padding:20px">Не удалось загрузить товары</p>';
   }
-}
-
-function updateStockBar() {
-  let s1870 = 0, s3201 = 0;
-  products.forEach(p => {
-    s1870 += (p.stock1870 || 0);
-    s3201 += (p.stock3201 || 0);
-  });
-  document.getElementById('stock-1870').textContent = s1870 > 0 ? s1870 + ' шт' : 'нет';
-  document.getElementById('stock-3201').textContent = s3201 > 0 ? s3201 + ' шт' : 'нет';
 }
 
 function renderCatalog() {
@@ -281,7 +270,7 @@ async function saveProduct() {
     if ((await res.json()).success) {
       ['edit-id','p-name','p-desc','p-price','p-stock-1870','p-stock-3201','p-photo','p-photo-file'].forEach(id => document.getElementById(id).value = '');
       document.getElementById('photo-preview').innerHTML = '';
-      renderAdminProducts(); renderCatalog(); updateStockBar();
+      renderAdminProducts(); renderCatalog();
       tg.showAlert('Товар сохранён');
     }
   } catch(e) { tg.showAlert('Ошибка'); }
@@ -292,7 +281,7 @@ async function deleteProduct(id) {
   products = products.filter(p => p.id !== id);
   try {
     await fetch('/api/admin/products', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({password: adminPassword, products}) });
-    renderAdminProducts(); renderCatalog(); updateStockBar();
+    renderAdminProducts(); renderCatalog();
   } catch(e) {}
 }
 
