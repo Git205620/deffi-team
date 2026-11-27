@@ -245,7 +245,54 @@ async function loginAdmin() {
     $('admin-login').classList.add('hidden');
     $('admin-panel').classList.remove('hidden');
     showAdminTab('products');
-    renderAdminProducts();
+    function renderAdminProducts() {
+  const container = $('admin-products');
+  const search = ($('admin-product-search')?.value || '').toLowerCase().trim();
+  const category = $('admin-product-category')?.value || 'all';
+
+  container.innerHTML = '';
+
+  const filtered = products.filter(p => {
+    const matchesSearch =
+      (p.name || '').toLowerCase().includes(search) ||
+      (p.subcategory || '').toLowerCase().includes(search);
+
+    const matchesCategory =
+      category === 'all' || p.category === category;
+
+    return matchesSearch && matchesCategory;
+  });
+
+  if (!filtered.length) {
+    container.innerHTML = '<p class="empty-state">Товары не найдены</p>';
+    return;
+  }
+
+  filtered.forEach(p => {
+    const div = document.createElement('div');
+    div.className = 'admin-product';
+
+    div.innerHTML = `
+      <div class="admin-product-info">
+        <strong>${safe(p.name)}</strong>
+        <small>
+          ${safe(p.category)} · ${Number(p.price)} ₽
+          · 18/70: ${Number(p.stock1870 || 0)}
+          · 32/01: ${Number(p.stock3201 || 0)}
+        </small>
+      </div>
+      <div class="admin-actions">
+        <button type="button" class="edit">Изменить</button>
+        <button type="button" class="delete danger">Удалить</button>
+      </div>
+    `;
+
+    div.querySelector('.edit').onclick = () => editProduct(p.id);
+    div.querySelector('.delete').onclick = () => deleteProduct(p.id);
+
+    container.appendChild(div);
+  });
+}
   } catch (e) { alertUser(e.message); }
 }
 function showAdminTab(tab) {
