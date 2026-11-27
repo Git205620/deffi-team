@@ -40,6 +40,9 @@
       <button class="cat-btn" data-cat="снюсы">Снюсы</button>
     </div>
 
+    <!-- Подкатегории -->
+    <div class="subcategories" id="subcategories"></div>
+
     <!-- Каталог -->
     <main id="catalog" class="catalog"></main>
 
@@ -129,6 +132,7 @@
             <option value="комплектующие">Комплектующие</option>
             <option value="снюсы">Снюсы</option>
           </select>
+          <input type="text" id="p-subcategory" placeholder="Подкатегория (например: Elf Bar, Waka...)" />
           <input type="number" id="p-price" placeholder="Цена ₽" />
           <input type="number" id="p-stock-1870" placeholder="Наличие 18/70" />
           <input type="number" id="p-stock-3201" placeholder="Наличие 32/01" />
@@ -167,12 +171,13 @@
 
     // Гирлянда огоньки
     const lights = document.querySelector('.garland-lights');
-    const colors = ['#ef4444','#22c55e','#eab308','#3b82f6','#a855f7','#f97316'];
-    for (let i = 0; i < 24; i++) {
+    const colors = ['#ff3b3b','#22c55e','#facc15','#38bdf8','#c084fc','#fb923c','#f472b6'];
+    for (let i = 0; i < 18; i++) {
       const light = document.createElement('div');
       light.className = 'light';
       light.style.background = colors[i % colors.length];
-      light.style.animationDelay = (i * 0.15) + 's';
+      light.style.animationDelay = (i * 0.18) + 's';
+      light.style.color = colors[i % colors.length];
       lights.appendChild(light);
     }
 

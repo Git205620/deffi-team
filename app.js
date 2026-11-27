@@ -6,6 +6,7 @@ let products = [];
 let cart = {};
 let adminPassword = null;
 let currentCategory = 'all';
+let currentSubcategory = null;
 let searchQuery = '';
 let currentProductId = null;
 
@@ -20,12 +21,42 @@ async function loadProducts() {
   }
 }
 
+function renderSubcategories() {
+  const container = document.getElementById('subcategories');
+  container.innerHTML = '';
+  if (currentCategory === 'all') return;
+
+  const subs = [...new Set(
+    products
+      .filter(p => p.category === currentCategory && p.subcategory)
+      .map(p => p.subcategory)
+  )].sort();
+
+  if (subs.length === 0) return;
+
+  const allBtn = document.createElement('button');
+  allBtn.className = 'sub-btn' + (currentSubcategory === null ? ' active' : '');
+  allBtn.textContent = 'Все';
+  allBtn.onclick = () => { currentSubcategory = null; renderCatalog(); };
+  container.appendChild(allBtn);
+
+  subs.forEach(sub => {
+    const btn = document.createElement('button');
+    btn.className = 'sub-btn' + (currentSubcategory === sub ? ' active' : '');
+    btn.textContent = sub;
+    btn.onclick = () => { currentSubcategory = sub; renderCatalog(); };
+    container.appendChild(btn);
+  });
+}
+
 function renderCatalog() {
+  renderSubcategories();
   const catalog = document.getElementById('catalog');
   catalog.innerHTML = '';
 
   let filtered = products;
   if (currentCategory !== 'all') filtered = filtered.filter(p => p.category === currentCategory);
+  if (currentSubcategory) filtered = filtered.filter(p => p.subcategory === currentSubcategory);
   if (searchQuery) {
     const q = searchQuery.toLowerCase();
     filtered = filtered.filter(p => (p.name && p.name.toLowerCase().includes(q)) || (p.description && p.description.toLowerCase().includes(q)));
@@ -67,6 +98,7 @@ document.querySelectorAll('.cat-btn').forEach(btn => {
     document.querySelectorAll('.cat-btn').forEach(b => b.classList.remove('active'));
     btn.classList.add('active');
     currentCategory = btn.dataset.cat;
+    currentSubcategory = null;
     renderCatalog();
   });
 });
@@ -226,6 +258,7 @@ function editProduct(id) {
   document.getElementById('p-name').value = p.name;
   document.getElementById('p-desc').value = p.description || '';
   document.getElementById('p-category').value = p.category || 'одноразки';
+  document.getElementById('p-subcategory').value = p.subcategory || '';
   document.getElementById('p-price').value = p.price;
   document.getElementById('p-stock-1870').value = p.stock1870 || 0;
   document.getElementById('p-stock-3201').value = p.stock3201 || 0;
@@ -251,6 +284,7 @@ async function saveProduct() {
   const name = document.getElementById('p-name').value.trim();
   const description = document.getElementById('p-desc').value.trim();
   const category = document.getElementById('p-category').value;
+  const subcategory = document.getElementById('p-subcategory').value.trim();
   const price = parseInt(document.getElementById('p-price').value) || 0;
   const stock1870 = parseInt(document.getElementById('p-stock-1870').value) || 0;
   const stock3201 = parseInt(document.getElementById('p-stock-3201').value) || 0;
@@ -259,16 +293,16 @@ async function saveProduct() {
 
   if (id) {
     const idx = products.findIndex(p => p.id == id);
-    if (idx !== -1) products[idx] = {...products[idx], name, description, category, price, stock1870, stock3201, photo};
+    if (idx !== -1) products[idx] = {...products[idx], name, description, category, subcategory, price, stock1870, stock3201, photo};
   } else {
     const newId = products.length ? Math.max(...products.map(p=>p.id))+1 : 1;
-    products.push({id: newId, name, description, category, price, stock1870, stock3201, photo});
+    products.push({id: newId, name, description, category, subcategory, price, stock1870, stock3201, photo});
   }
 
   try {
     const res = await fetch('/api/admin/products', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({password: adminPassword, products}) });
     if ((await res.json()).success) {
-      ['edit-id','p-name','p-desc','p-price','p-stock-1870','p-stock-3201','p-photo','p-photo-file'].forEach(id => document.getElementById(id).value = '');
+      ['edit-id','p-name','p-desc','p-subcategory','p-price','p-stock-1870','p-stock-3201','p-photo','p-photo-file'].forEach(id => document.getElementById(id).value = '');
       document.getElementById('photo-preview').innerHTML = '';
       renderAdminProducts(); renderCatalog();
       tg.showAlert('Товар сохранён');

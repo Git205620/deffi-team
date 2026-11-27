@@ -460,31 +460,7 @@ select#p-category {
   color: rgba(186, 230, 253, 0.5);
 }
 
-/* Гирлянда */
-.garland {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  height: 14px;
-  z-index: 20;
-  background: repeating-linear-gradient(
-    90deg,
-    #ef4444 0px,
-    #ef4444 12px,
-    #22c55e 12px,
-    #22c55e 24px,
-    #eab308 24px,
-    #eab308 36px,
-    #3b82f6 36px,
-    #3b82f6 48px
-  );
-  box-shadow: 0 2px 10px rgba(0,0,0,0.4);
-  animation: garland-glow 2s ease-in-out infinite alternate;
-}
 
-@keyframes garland-glow {
-  from { filter: brightness(1); }
   to { filter: brightness(1.25); }
 }
 
@@ -502,36 +478,7 @@ select#p-category {
   font-weight: 600;
 }
 
-/* Гирлянда с огоньками */
-.garland {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  height: 18px;
-  z-index: 30;
-  background: #0a0a0a;
-  overflow: hidden;
-}
 
-.garland-lights {
-  display: flex;
-  justify-content: space-around;
-  align-items: center;
-  height: 100%;
-  padding: 0 4px;
-}
-
-.light {
-  width: 10px;
-  height: 10px;
-  border-radius: 50%;
-  animation: blink 1.2s ease-in-out infinite alternate;
-  box-shadow: 0 0 6px currentColor;
-}
-
-@keyframes blink {
-  from { opacity: 0.4; transform: scale(0.85); }
   to { opacity: 1; transform: scale(1.1); }
 }
 
@@ -623,4 +570,79 @@ select#p-category {
 .product-locations .loc.out {
   color: #f87171;
   opacity: 0.7;
+}
+
+/* Красивая гирлянда */
+.garland {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 22px;
+  z-index: 40;
+  background: linear-gradient(to bottom, #0f172a, transparent);
+  pointer-events: none;
+  overflow: hidden;
+}
+
+.garland-lights {
+  display: flex;
+  justify-content: space-evenly;
+  align-items: flex-start;
+  height: 100%;
+  padding: 2px 6px 0;
+}
+
+.light {
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  position: relative;
+  animation: twinkle 1.4s ease-in-out infinite alternate;
+  box-shadow: 0 0 8px 2px currentColor;
+}
+
+.light::after {
+  content: '';
+  position: absolute;
+  top: 9px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 1.5px;
+  height: 8px;
+  background: #334155;
+  border-radius: 1px;
+}
+
+@keyframes twinkle {
+  0%   { opacity: 0.45; transform: scale(0.85); }
+  100% { opacity: 1;    transform: scale(1.15); }
+}
+
+/* Подкатегории */
+.subcategories {
+  display: flex;
+  gap: 8px;
+  padding: 8px 12px 4px;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+}
+.subcategories::-webkit-scrollbar { display: none; }
+
+.sub-btn {
+  flex-shrink: 0;
+  padding: 6px 12px;
+  border-radius: 16px;
+  border: 1px solid rgba(56, 189, 248, 0.25);
+  background: rgba(14, 165, 233, 0.08);
+  color: #94a3b8;
+  font-size: 12.5px;
+  font-weight: 600;
+  cursor: pointer;
+}
+.sub-btn.active {
+  background: rgba(56, 189, 248, 0.25);
+  color: #e0f2fe;
+  border-color: rgba(56, 189, 248, 0.5);
 }
