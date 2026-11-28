@@ -364,7 +364,8 @@ function renderAdminOrders() {
     const items = (order.items || []).map(i => `<li>${safe(i.name)} × ${i.quantity} — ${i.price * i.quantity} ₽</li>`).join('');
     const div = document.createElement('article');
     div.className = 'order-card';
-    div.innerHTML = `<div class="order-head"><strong>Заказ ${safe(order.id)}</strong><span>${safe(order.status)}</span></div><small>${safe(date)} · склад ${order.warehouse === '1870' ? '18/70' : '32/01'}</small><p>${safe(order.name || 'Покупатель')} · ${safe(order.phone)}</p><ul>${items}</ul><p class="order-total">Итого: ${Number(order.total)} ₽</p><p class="order-delivery">${order.deliveryType === 'delivery' ? 'Доставка: ' + safe(order.address) : 'Самовывоз'}</p><label>Статус<select class="status-select">${['Новый','Принят','Готовится','Готов','Выдан','Отменён'].map(s => `<option ${s===order.status?'selected':''}>${s}</option>`).join('')}</select></label>`;
+    const telegramContact = order.username ? `@${safe(order.username)}` : (order.userId ? `ID: ${safe(order.userId)}` : 'не указан');
+    div.innerHTML = `<div class="order-head"><strong>Заказ ${safe(order.id)}</strong><span>${safe(order.status)}</span></div><small>${safe(date)} · склад ${order.warehouse === '1870' ? '18/70' : '32/01'}</small><p>${safe(order.name || 'Покупатель')} · ${safe(order.phone)}</p><p>Telegram: ${telegramContact}</p><ul>${items}</ul><p class="order-total">Итого: ${Number(order.total)} ₽</p><p class="order-delivery">${order.deliveryType === 'delivery' ? 'Доставка: ' + safe(order.address) : 'Самовывоз'}</p><label>Статус<select class="status-select">${['Новый','Принят','Готовится','Готов','Выдан','Отменён'].map(s => `<option ${s===order.status?'selected':''}>${s}</option>`).join('')}</select></label>`;
     div.querySelector('select').onchange = e => updateOrderStatus(order.id, e.target.value);
     container.appendChild(div);
   });

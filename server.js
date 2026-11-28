@@ -261,9 +261,13 @@ app.post('/api/order', async (req, res) => {
     const deliveryText = deliveryType === 'delivery'
       ? `🚚 Доставка (+${deliveryPrice} ₽)\nАдрес: ${escapeHtml(address)}`
       : `📍 Самовывоз: ${order.warehouse === '1870' ? '18/70 Зябь' : '32/01'}`;
+    const telegramContact = order.username
+      ? `🔗 Telegram: @${escapeHtml(order.username)}`
+      : `🔗 Telegram username: не указан${order.userId ? `\n🆔 Telegram ID: ${escapeHtml(order.userId)}` : ''}`;
     const message = `🛒 <b>Новый заказ ${escapeHtml(id)}</b>\n\n` +
-      `👤 ${escapeHtml(order.name || (order.username ? '@' + order.username : 'Покупатель'))}\n` +
-      `📱 ${escapeHtml(phone)}\n🏬 Склад: ${order.warehouse === '1870' ? '18/70' : '32/01'}\n\n` +
+      `👤 Имя: ${escapeHtml(order.name || 'Не указано')}\n` +
+      `${telegramContact}\n` +
+      `📱 Телефон: ${escapeHtml(phone)}\n🏬 Склад: ${order.warehouse === '1870' ? '18/70' : '32/01'}\n\n` +
       `${itemsText}\n\n💰 <b>Итого: ${total} ₽</b>\n${deliveryText}\n` +
       `🕐 ${new Date(order.createdAt).toLocaleString('ru-RU', { timeZone: 'Europe/Moscow' })}`;
     const notified = await notifyAdmins(message);
