@@ -1,28 +1,36 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <meta name="theme-color" content="#090909">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
   <title>Deffi Team</title>
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
-  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="style.css" />
 </head>
 <body>
   <div id="snow"></div>
-  <div class="garland"><div class="garland-lights"></div></div>
+  <div class="garland">
+    <div class="garland-lights"></div>
+  </div>
 
   <div id="app">
+    <!-- Шапка -->
     <header class="header">
-      <div class="logo"><span class="logo-icon">❄</span><h1>Deffi Team</h1></div>
-      <div class="header-actions">
-        <button id="change-warehouse-btn" class="warehouse-switch" type="button">Склад 18/70</button>
-        <button id="cart-btn" class="cart-btn" type="button">🛒 <span id="cart-count">0</span></button>
+      <div class="logo">
+        <span class="logo-icon">❄</span>
+        <h1>Deffi Team</h1>
       </div>
+      <button id="cart-btn" class="cart-btn">
+        🛒 <span id="cart-count">0</span>
+      </button>
     </header>
 
-    <div class="search-box"><input type="text" id="search-input" placeholder="🔍 Поиск товара..."></div>
+    <!-- Поиск -->
+    <div class="search-box">
+      <input type="text" id="search-input" placeholder="🔍 Поиск товара..." />
+    </div>
 
+    <!-- Категории -->
     <div class="categories" id="categories">
       <button class="cat-btn active" data-cat="all">Все</button>
       <button class="cat-btn" data-cat="вейпы">Вейпы</button>
@@ -31,110 +39,111 @@
       <button class="cat-btn" data-cat="комплектующие">Комплектующие</button>
       <button class="cat-btn" data-cat="снюсы">Снюсы</button>
     </div>
-    <div class="subcategories" id="subcategories"></div>
+
+    <!-- Каталог -->
     <main id="catalog" class="catalog"></main>
 
-    <div id="warehouse-modal" class="modal warehouse-modal">
-      <div class="modal-content chooser-content">
-        <div class="chooser-mark">DEFFI TEAM</div>
-        <h2>Выберите склад</h2>
-        <p>Каталог и остатки будут показаны для выбранной точки</p>
-        <button class="warehouse-choice" onclick="chooseWarehouse('1870')"><strong>18/70</strong><span>Зябь</span></button>
-        <button class="warehouse-choice" onclick="chooseWarehouse('3201')"><strong>32/01</strong><span>Склад 32/01</span></button>
-      </div>
-    </div>
-
+    <!-- Карточка товара -->
     <div id="product-modal" class="modal hidden">
       <div class="modal-content product-detail">
-        <div class="modal-header"><h2 id="pd-name">Товар</h2><button class="close-btn" onclick="closeProduct()">×</button></div>
+        <div class="modal-header">
+          <h2 id="pd-name">Товар</h2>
+          <button class="close-btn" onclick="closeProduct()">×</button>
+        </div>
         <img id="pd-photo" class="pd-photo" src="" alt="">
         <div id="pd-desc" class="pd-desc"></div>
-        <div class="pd-stocks"><span id="warehouse-current">Склад</span>: <b id="pd-stock">0</b> шт.</div>
+        <div class="pd-stocks">
+          <div>18/70: <b id="pd-stock-1870">0</b> шт</div>
+          <div>32/01: <b id="pd-stock-3201">0</b> шт</div>
+        </div>
         <div class="pd-price" id="pd-price">0 ₽</div>
         <button class="order-btn" id="pd-add-btn">В корзину</button>
       </div>
     </div>
 
+    <!-- Корзина -->
     <div id="cart-modal" class="modal hidden">
       <div class="modal-content">
-        <div class="modal-header"><h2>🛒 Корзина</h2><button class="close-btn" onclick="closeCart()">×</button></div>
-        <div class="cart-warehouse">Ваш склад: <strong id="warehouse-current-cart">выбранный</strong></div>
+        <div class="modal-header">
+          <h2>🛒 Корзина</h2>
+          <button class="close-btn" onclick="closeCart()">×</button>
+        </div>
         <div id="cart-items"></div>
-        <div class="cart-total">Итого: <span id="cart-total">0</span> ₽</div>
-        <div class="promo-text">🎁 При покупке от 2000 рублей — подарок жижа солевая монашка!</div>
+        <div class="cart-total">
+          Итого: <span id="cart-total">0</span> ₽
+        </div>
+
+        <div class="promo-text">
+          🎁 При покупке от 2000 рублей — жижа солевая Монашка в подарок!
+        </div>
+
         <div class="delivery-section">
-          <label class="radio-label"><input id="pickup-radio" type="radio" name="delivery" value="pickup" checked><span id="pickup-text">Самовывоз</span></label>
-          <label class="radio-label"><input type="radio" name="delivery" value="delivery">🚚 Доставка по городу (+250 ₽)</label>
-          <div id="address-field" class="hidden"><input type="text" id="address" placeholder="Адрес доставки"></div>
+          <label class="radio-label">
+            <input type="radio" name="delivery" value="pickup1" checked />
+            📍 Самовывоз — 18/70 Зябь
+          </label>
+          <label class="radio-label">
+            <input type="radio" name="delivery" value="pickup2" />
+            📍 Самовывоз — 32/01
+          </label>
+          <label class="radio-label">
+            <input type="radio" name="delivery" value="delivery" />
+            🚚 Доставка по городу (+250 ₽)
+          </label>
+          <div id="address-field" class="hidden">
+            <input type="text" id="address" placeholder="Адрес доставки" />
+          </div>
         </div>
+
         <div class="contact-section">
-          <input type="text" id="name" placeholder="Ваше имя">
-          <input type="tel" id="phone" placeholder="Телефон *" required>
+          <input type="text" id="name" placeholder="Ваше имя" />
+          <input type="tel" id="phone" placeholder="Телефон *" required />
         </div>
+
         <button id="order-btn" class="order-btn" onclick="submitOrder()">Оформить заказ</button>
       </div>
     </div>
 
+    <!-- Админка -->
     <div id="admin-modal" class="modal hidden">
       <div class="modal-content admin-content">
-        <div class="modal-header"><h2>⚙️ Админка</h2><button class="close-btn" onclick="closeAdmin()">×</button></div>
+        <div class="modal-header">
+          <h2>⚙️ Админка</h2>
+          <button class="close-btn" onclick="closeAdmin()">×</button>
+        </div>
+
         <div id="admin-login">
-          <input type="password" id="admin-password" placeholder="Пароль администратора">
+          <input type="password" id="admin-password" placeholder="Пароль" />
           <button onclick="loginAdmin()">Войти</button>
         </div>
+
         <div id="admin-panel" class="hidden">
-          <div class="admin-tabs">
-            <button class="admin-tab active" data-tab="products">Товары</button>
-            <button class="admin-tab" data-tab="orders">Заказы</button>
+          <h3>Добавить / изменить товар</h3>
+          <input type="hidden" id="edit-id" />
+          <input type="text" id="p-name" placeholder="Название" />
+          <input type="text" id="p-desc" placeholder="Описание" />
+          <select id="p-category">
+            <option value="вейпы">Вейпы</option>
+            <option value="одноразки">Одноразки</option>
+            <option value="жижи">Жижи</option>
+            <option value="комплектующие">Комплектующие</option>
+            <option value="снюсы">Снюсы</option>
+          </select>
+          <input type="number" id="p-price" placeholder="Цена ₽" />
+          <input type="number" id="p-stock-1870" placeholder="Наличие 18/70" />
+          <input type="number" id="p-stock-3201" placeholder="Наличие 32/01" />
+          
+          <div class="photo-upload">
+            <label class="photo-label">Фото товара</label>
+            <input type="file" id="p-photo-file" accept="image/*" />
+            <input type="text" id="p-photo" placeholder="Или ссылка на фото" />
+            <div id="photo-preview"></div>
           </div>
-          <section id="admin-products-view">
-            <div id="product-form" class="product-form">
-              <h3 id="product-form-title">Добавить товар</h3>
-              <input type="hidden" id="edit-id">
-              <input type="text" id="p-name" placeholder="Название товара">
-              <input type="text" id="p-desc" placeholder="Описание">
-              <select id="p-category">
-                <option value="вейпы">Вейпы</option><option value="одноразки">Одноразки</option>
-                <option value="жижи" selected>Жижи</option><option value="комплектующие">Комплектующие</option><option value="снюсы">Снюсы</option>
-              </select>
-              <input type="text" id="p-subcategory" placeholder="Подкатегория / бренд">
-              <input type="number" id="p-price" placeholder="Цена ₽" min="1">
-              <div class="stock-inputs"><input type="number" id="p-stock-1870" placeholder="Остаток 18/70" min="0"><input type="number" id="p-stock-3201" placeholder="Остаток 32/01" min="0"></div>
-              <div class="photo-upload">
-                <label class="photo-label">Фото товара</label>
-                <input type="file" id="p-photo-file" accept="image/*">
-                <input type="text" id="p-photo" placeholder="Или ссылка на фото">
-                <div id="photo-preview"></div>
-              </div>
-              <button onclick="saveProduct()">Сохранить товар</button>
-              <button id="new-product-btn" class="secondary-btn" type="button">Очистить форму</button>
-            </div>
-            <h3 class="admin-section-title">Текущие товары</h3>
 
-<div class="admin-search">
-  <input
-    type="search"
-    id="admin-product-search"
-    placeholder="🔍 Поиск товара по названию..."
-    oninput="renderAdminProducts()"
-  >
+          <button onclick="saveProduct()">Сохранить товар</button>
 
-  <select id="admin-product-category" onchange="renderAdminProducts()">
-    <option value="all">Все категории</option>
-    <option value="жижи">Жижи</option>
-    <option value="вейпы">Вейпы</option>
-    <option value="одноразки">Одноразки</option>
-    <option value="комплектующие">Комплектующие</option>
-    <option value="снюсы">Снюсы</option>
-  </select>
-</div>
-
-<div id="admin-products"></div>
-          </section>
-          <section id="admin-orders-view" class="hidden">
-            <button class="secondary-btn refresh-btn" onclick="loadAdminOrders()">Обновить заказы</button>
-            <div id="admin-orders"></div>
-          </section>
+          <h3 style="margin-top:20px">Текущие товары</h3>
+          <div id="admin-products"></div>
         </div>
       </div>
     </div>
@@ -142,16 +151,43 @@
 
   <script src="app.js"></script>
   <script>
-    const snow = document.getElementById('snow');
-    for (let i=0;i<32;i++) {
-      const f=document.createElement('div'); f.className='snowflake'; f.textContent='❄';
-      f.style.left=Math.random()*100+'vw'; f.style.animationDuration=(Math.random()*7+7)+'s';
-      f.style.animationDelay=(Math.random()*8)+'s'; f.style.opacity=Math.random()*.55+.25;
-      f.style.fontSize=(Math.random()*10+8)+'px'; snow.appendChild(f);
+    // Снег
+    const snowContainer = document.getElementById('snow');
+    for (let i = 0; i < 35; i++) {
+      const flake = document.createElement('div');
+      flake.className = 'snowflake';
+      flake.style.left = Math.random() * 100 + 'vw';
+      flake.style.animationDuration = (Math.random() * 6 + 6) + 's';
+      flake.style.animationDelay = (Math.random() * 5) + 's';
+      flake.style.opacity = Math.random() * 0.6 + 0.3;
+      flake.style.fontSize = (Math.random() * 12 + 10) + 'px';
+      flake.innerHTML = '❄';
+      snowContainer.appendChild(flake);
     }
-    const lights=document.querySelector('.garland-lights');
-    const colors=['#ff5252','#f6c85f','#67d69b','#65b9ff','#d49cff','#ff9d57'];
-    for(let i=0;i<22;i++){const l=document.createElement('i');l.className='light';l.style.background=colors[i%colors.length];l.style.color=colors[i%colors.length];l.style.animationDelay=(i*.13)+'s';lights.appendChild(l);}
+
+    // Гирлянда огоньки
+    const lights = document.querySelector('.garland-lights');
+    const colors = ['#ef4444','#22c55e','#eab308','#3b82f6','#a855f7','#f97316'];
+    for (let i = 0; i < 24; i++) {
+      const light = document.createElement('div');
+      light.className = 'light';
+      light.style.background = colors[i % colors.length];
+      light.style.animationDelay = (i * 0.15) + 's';
+      lights.appendChild(light);
+    }
+
+    // 5 кликов по логотипу = админка
+    let logoClicks = 0;
+    let logoTimer = null;
+    document.querySelector('.logo').addEventListener('click', () => {
+      logoClicks++;
+      clearTimeout(logoTimer);
+      logoTimer = setTimeout(() => logoClicks = 0, 1500);
+      if (logoClicks >= 5) {
+        logoClicks = 0;
+        openAdmin();
+      }
+    });
   </script>
 </body>
 </html>
