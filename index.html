@@ -9,6 +9,45 @@
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
+  <div id="age-gate">
+  <div class="age-card">
+    <div class="age-logo">DEFFI TEAM</div>
+
+    <div class="age-icon">18+</div>
+
+    <h2>Вам уже исполнилось 18 лет?</h2>
+
+    <p>Подтвердите свой возраст для входа в магазин.</p>
+
+    <div class="age-buttons">
+      <button onclick="confirmAge(true)">ДА</button>
+      <button onclick="confirmAge(false)">НЕТ</button>
+    </div>
+  </div>
+</div>
+
+<script>
+function confirmAge(answer) {
+  const gate = document.getElementById('age-gate');
+
+  if (answer === true) {
+    document.body.classList.add('age-confirmed');
+    gate.remove();
+  } else {
+    document.getElementById('age-gate').innerHTML = `
+      <div class="age-card">
+        <div class="age-icon">18+</div>
+        <h2>Вход закрыт</h2>
+        <p>Вы отказались от подтверждения возраста.</p>
+      </div>
+    `;
+
+    if (window.Telegram && window.Telegram.WebApp) {
+      window.Telegram.WebApp.close();
+    }
+  }
+}
+</script>
   <div id="snow"></div>
   <div class="garland"><div class="garland-lights"></div></div>
 
